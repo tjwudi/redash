@@ -27,11 +27,7 @@
         queryResult: '=',
         options: '=?'
       },
-<<<<<<< HEAD
       templateUrl: '/views/visualizations/chart.html',
-=======
-      templateUrl: "/views/visualizations/chart.html",
->>>>>>> feature/add-dimension
       replace: false,
       controller: ['$scope', function ($scope) {
         $scope.chartSeries = [];
