@@ -27,13 +27,40 @@
         queryResult: '=',
         options: '=?'
       },
+<<<<<<< HEAD
       templateUrl: '/views/visualizations/chart.html',
+=======
+      templateUrl: "/views/visualizations/chart.html",
+>>>>>>> feature/add-dimension
       replace: false,
       controller: ['$scope', function ($scope) {
         $scope.chartSeries = [];
         $scope.chartOptions = {};
         $scope.dateRangeEnabled = $scope.options.xAxis && $scope.options.xAxis.type === 'datetime';
         $scope.dateRange = { min: moment('1970-01-01'), max: moment() };
+        /**
+         * Dimension objects array. An example of this would be:
+         * [{
+         *   name: 'name of dimension',
+         *   enabled: true // whether we want to show this dimension in chart
+         * }]
+         *
+         * @type {Array}
+         */
+        $scope.dimensions = [];
+
+        var reloadDimensions = function () {
+          $scope.dimensions = _.pairs($scope.options.columnMapping)
+            .filter(function (pair) {
+              return pair[1] === 'dimension';
+            })
+            .map(function (pair) {
+              return {
+                name: pair[0],
+                enabled: false
+              }
+            });
+        };
 
         var reloadData = function(data) {
           if (!data || ($scope.queryResult && $scope.queryResult.getData()) == null) {
@@ -43,6 +70,7 @@
 
             var chartData = $scope.queryResult.getChartData(
               $scope.options.columnMapping,
+              $scope.dimensions,
               $scope.dateRangeEnabled ? $scope.dateRange : 0
             );
 
@@ -94,8 +122,12 @@
           reloadData(true);
         }, true);
 
+        $scope.$watch('dimensions', function (dimensions) {
+          reloadData(true);
+        }, true);
 
         $scope.$watchCollection('options.columnMapping', function (chartOptions) {
+          reloadDimensions();
           reloadData(true);
         });
 
@@ -155,7 +187,8 @@
           "X": "x",
           "Y": "y",
           "Series": "series",
-          "Unused": "unused"
+          "Unused": "unused",
+          "Dimension": "dimension"
         };
 
         scope.series = [];
