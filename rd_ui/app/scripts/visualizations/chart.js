@@ -41,6 +41,8 @@
          *   enabled: true // whether we want to show this dimension in chart
          * }]
          *
+         * Always Replace the whole dateRange object when making change. If we change min and max separately, we can run into the issue that $scope.$watch('dateRange') cannot detect the changes. We should not use $scope.$watch('dateRange') with the third parameter set to `true`, because Moment object is very complex. Watching the whole Moment object can lead to many issues (like too many digest loop) and also some performance hazards.
+         *
          * @type {Array}
          */
         $scope.dimensions = [];
@@ -86,9 +88,8 @@
 
             // Update date range by finding date extremes
             // TODO: Find a faster way to do this
-            // ISSUE: chart.getExtreme() does not support getting Moment object
-            //        out of box
-            if ($scope.dateRangeEnabled && chartData && chartData.length > 0) {
+            // ISSUE: chart.getExtreme() does not support getting Moment object out of box
+            if ($scope.dateRangeEnabled && chartData) {
               var maxDateRange = moment('1970-01-01'),
                 minDateRange = moment();
               _.each(chartData, function (s) {
@@ -102,8 +103,10 @@
                   }
                 });
               });
-              $scope.dateRange.min = minDateRange;
-              $scope.dateRange.max = maxDateRange;
+              $scope.dateRange = {
+                min: minDateRange,
+                max: maxDateRange
+              };
             }
           };
         };
@@ -131,7 +134,7 @@
           reloadData(data);
         });
 
-        $scope.$watch('dateRange.min', function(minDateRange, oldMinDateRange) {
+        $scope.$watch('dateRange', function(minDateRange, oldMinDateRange) {
           if (!minDateRange.isSame(oldMinDateRange)) {
             reloadData(true);
           }
