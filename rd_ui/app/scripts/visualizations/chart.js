@@ -134,7 +134,7 @@
           reloadData(data);
         });
 
-        $scope.$watch('dateRange', function(minDateRange, oldMinDateRange) {
+        $scope.$watch('dateRange.min', function(minDateRange, oldMinDateRange) {
           if (!minDateRange.isSame(oldMinDateRange)) {
             reloadData(true);
           }
